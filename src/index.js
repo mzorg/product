@@ -1,26 +1,31 @@
-
-var express = require('express');
+// Import dependencies
+require("./config/config");
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
 let app = express();
 
-app.get('/', async (req, res) => {
-    res.send('products');
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Parse application/json
+app.use(bodyParser.json());
+
+// Routes
+app.use(require("./routes/index"));
+
+// Connect to MongoDb
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true }, (err, res) => {
+  if (err) throw err;
+  console.log("Database ONLINE");
 });
 
-app.get('/healthy', async (req, res) => {
-  res.status(200).send('readyness: ok');
-});
-
-app.get('/healthz', async (req, res) => {
-  res.status(200).send('liveness: ok');
-});
-
-
-let port = normalizePort(process.env.PORT || '3000');
+// Start express server
+let port = normalizePort(process.env.PORT || "3000");
 app.listen(port, () => {
-    console.log('Server listen on port ' + port);
+  console.log("Server listen on port " + port);
 });
-
 
 /**
  * Normalize a port into a number, string, or false.
