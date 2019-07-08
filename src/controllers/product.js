@@ -57,7 +57,7 @@ exports.createProduct = (req, res, next) => {
 // =====================
 // Delete a product
 // =====================
-exports.getProducts = (req, res, next) => {
+exports.deleteProduct = (req, res, next) => {
     let id = req.params.id;
     Product.findByIdAndDelete(id)
         .then(product => {
