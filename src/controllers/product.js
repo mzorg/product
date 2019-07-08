@@ -32,6 +32,7 @@ exports.createProduct = (req, res, next) => {
         title: body.title,
         description: body.description,
         price: parseInt(body.price, 10),
+        stock: parseInt(body.stock, 10),
         imageUrl: body.imageUrl,
         userId: body.userId || "test"
     });

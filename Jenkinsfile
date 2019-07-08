@@ -35,11 +35,11 @@ node {
         stage('Deploy on K8s'){
             sh  script: """
                 set +e
-                helm install --name country --set image.repository=${ImageName} --set image.tag=${imageTag} ./charts
+                helm install --name product --set image.repository=${ImageName} --set image.tag=${imageTag} ./charts
                 set -e
                 """
             // update to New version
-            sh "helm upgrade --wait --set image.repository=${ImageName} --set image.tag=${imageTag} country ./charts"
+            sh "helm upgrade --wait --set image.repository=${ImageName} --set image.tag=${imageTag} product ./charts"
 
 
         }
