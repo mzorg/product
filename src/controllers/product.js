@@ -26,9 +26,9 @@ exports.getProducts = (req, res, next) => {
 // Create a product
 // =====================
 exports.createProduct = (req, res, next) => {
-    var body = req.body; // parse body request
+    let body = req.body; // parse body request
     // Create a new Product
-    var product = new Product({
+    let product = new Product({
         title: body.title,
         description: body.description,
         price: parseInt(body.price, 10),
@@ -51,4 +51,27 @@ exports.createProduct = (req, res, next) => {
             data: productDB
         });
     });
+};
+
+// =====================
+// Delete a product
+// =====================
+exports.getProducts = (req, res, next) => {
+    let id = req.params.id;
+    Product.findByIdAndDelete(id)
+        .then(product => {
+            // Return deleted product
+            return res.json({
+                ok: true,
+                data: product
+            });
+        })
+        .catch(err => {
+            // If there was a error
+            return res.status(500).json({
+                ok: false,
+                msj: 'Error deleting Product',
+                errors: err
+            });
+        });
 };
