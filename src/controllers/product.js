@@ -23,6 +23,29 @@ exports.getProducts = (req, res, next) => {
 };
 
 // =====================
+// Get a product
+// =====================
+exports.getProduct = (req, res, next) => {
+    let id = req.params.id;
+    Product.findById(id)
+        .then(product => {
+            // Return product
+            return res.json({
+                ok: true,
+                data: product
+            });
+        })
+        .catch(err => {
+            // If there was a error
+            return res.status(500).json({
+                ok: false,
+                msj: 'Error getting Product',
+                errors: err
+            });
+        });
+};
+
+// =====================
 // Create a product
 // =====================
 exports.createProduct = (req, res, next) => {
@@ -72,6 +95,31 @@ exports.deleteProduct = (req, res, next) => {
             return res.status(500).json({
                 ok: false,
                 msj: 'Error deleting Product',
+                errors: err
+            });
+        });
+};
+
+// =====================
+// Update product
+// =====================
+exports.updateProduct = (req, res, next) => {
+    let id = req.params.id;
+    let body = req.body; // parse body request
+    // Save created product
+    Product.findByIdAndUpdate(id, body, {new: true})
+        .then(product => {
+            // Return updated product
+            return res.json({
+                ok: true,
+                data: product
+            });
+        })
+        .catch(err => {
+            // If there was a error
+            return res.status(500).json({
+                ok: false,
+                msj: 'Error updating Product',
                 errors: err
             });
         });
