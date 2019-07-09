@@ -4,6 +4,9 @@ metadata:
   name: "{{ .Release.Name }}-deployment"
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
   template:
     metadata:
       name: {{ .Release.Name }}
