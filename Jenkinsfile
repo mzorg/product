@@ -59,13 +59,7 @@ pipeline {
                 branch 'develop' 
             }
             steps {
-                sh  script: """
-                    set +e
-                    helm install --name product --namespace ${env.Namespace_dev} --set image.repository=${env.ImageName}_dev --set image.tag=${env.imageTag} ./charts
-                    set -e
-                    """
-                // update to New version
-                sh "helm upgrade --wait --namespace ${env.Namespace_dev} --set image.repository=${env.ImageName}_dev --set image.tag=${env.imageTag} product ./charts"
+                sh "helm upgrade --install --wait --namespace ${env.Namespace_dev} --set image.repository=${env.ImageName}_dev --set image.tag=${env.imageTag} product ./charts"
             }
         }
         stage('Deploy on K8s for production'){
@@ -73,13 +67,7 @@ pipeline {
                 branch 'master' 
             }
             steps {
-                sh  script: """
-                    set +e
-                    helm install --name product --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} ./charts
-                    set -e
-                    """
-                // update to New version
-                sh "helm upgrade --wait --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
+                sh "helm upgrade --install --wait --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
             }
         }
 
