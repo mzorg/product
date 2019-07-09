@@ -6,15 +6,19 @@ spec:
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
-      name: nodejs
+      name: {{ .Release.Name }}
       labels: # labels to select/identify the deployment
-        app: nodejs  
+        app: {{ .Release.Name }}  
       annotations:
         timestamp: "{{ date "20060102150405" .Release.Time }}"
     spec:     # pod spec                  
       containers:
-      - name: nodejs
+      - name: {{ .Release.Name }}
+        {{- if .Values.image.tag }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        {{- else }}
+        image: "{{ .Values.image.repository }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - name: nodejsport
