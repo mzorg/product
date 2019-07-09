@@ -59,7 +59,7 @@ pipeline {
                 branch 'develop' 
             }
             steps {
-                sh "helm upgrade --install --wait --namespace ${env.Namespace_dev} --set image.repository=${env.ImageName}_dev --set image.tag=${env.imageTag} product ./charts"
+                sh "helm upgrade --install --wait --namespace ${env.Namespace_dev} --set microservice=product --set image.repository=${env.ImageName}_dev --set image.tag=${env.imageTag} product_dev ./charts"
             }
         }
         stage('Deploy on K8s for production'){
@@ -67,7 +67,7 @@ pipeline {
                 branch 'master' 
             }
             steps {
-                sh "helm upgrade --install --wait --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
+                sh "helm upgrade --install --wait --namespace ${env.Namespace} --set microservice=product --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
             }
         }
 
