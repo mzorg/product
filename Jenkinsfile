@@ -1,14 +1,13 @@
 pipeline {
     agent any
-    def Namespace = "default"
-    def ImageName = "mati92/product"
-    def DockerhubCred = "dockerhub"
+    environment {
+        def Namespace = "default"
+        def ImageName = "mati92/product"
+        def DockerhubCred = "dockerhub"
+        def imageTag = sh "git rev-parse --short HEAD > .git/commit-id"
+        imageTag = readFile('.git/commit-id').trim()
+    }
     stages {
-        stage('Checkout') {
-            checkout scm
-            sh "git rev-parse --short HEAD > .git/commit-id"
-            imageTag= readFile('.git/commit-id').trim()
-        }
         stage('Environment') {
             sh 'git --version'
             echo "Branch: ${env.BRANCH_NAME}"
@@ -16,13 +15,13 @@ pipeline {
             sh 'printenv'
         }
         stage('Build Docker test'){
-            sh "docker build -t ${ImageName}:${imageTag}-test -f Dockerfile.test --no-cache ."
+            sh "docker build -t ${env.ImageName}:${env.imageTag}-test -f Dockerfile.test --no-cache ."
         }
         stage('Docker test'){
-            sh "docker run --rm ${ImageName}:${imageTag}-test"
+            sh "docker run --rm ${env.ImageName}:${env.imageTag}-test"
         }
         stage('Clean Docker test'){
-            sh "docker rmi ${ImageName}:${imageTag}-test"
+            sh "docker rmi ${env.ImageName}:${env.imageTag}-test"
         }
         stage('Build Docker for development'){
             when {
@@ -31,9 +30,9 @@ pipeline {
             steps {
                 ImageName = ImageName + "_dev" // set new ImageName for develop
                 Namespace = "develop" // set new Namespace for develop
-                withDockerRegistry([credentialsId: "${DockerhubCred}", url: 'https://index.docker.io/v1/']) {
-                    sh "docker build -f Dockerfile.local -t ${ImageName}:${imageTag} --no-cache ."
-                    sh "docker push ${ImageName}:${imageTag}"
+                withDockerRegistry([credentialsId: "${env.DockerhubCred}", url: 'https://index.docker.io/v1/']) {
+                    sh "docker build -f Dockerfile.local -t ${env.ImageName}:${env.imageTag} --no-cache ."
+                    sh "docker push ${env.ImageName}:${env.imageTag}"
                 }
             }
         }
@@ -42,9 +41,9 @@ pipeline {
                 branch 'master' 
             }
             steps {
-                withDockerRegistry([credentialsId: "${DockerhubCred}", url: 'https://index.docker.io/v1/']) {
-                    sh "docker build -t ${ImageName}:${imageTag} --no-cache ."
-                    sh "docker push ${ImageName}:${imageTag}"
+                withDockerRegistry([credentialsId: "${env.DockerhubCred}", url: 'https://index.docker.io/v1/']) {
+                    sh "docker build -t ${env.ImageName}:${env.imageTag} --no-cache ."
+                    sh "docker push ${env.ImageName}:${env.imageTag}"
                 }
             }
         }
@@ -55,11 +54,11 @@ pipeline {
             steps {
                 sh  script: """
                     set +e
-                    helm install --name product --namespace ${Namespace} --set image.repository=${ImageName} --set image.tag=${imageTag} ./charts
+                    helm install --name product --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} ./charts
                     set -e
                     """
                 // update to New version
-                sh "helm upgrade --wait --namespace ${Namespace} --set image.repository=${ImageName} --set image.tag=${imageTag} product ./charts"
+                sh "helm upgrade --wait --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
             }
         }
         stage('Deploy on K8s for production'){
@@ -69,11 +68,11 @@ pipeline {
             steps {
                 sh  script: """
                     set +e
-                    helm install --name product --namespace ${Namespace} --set image.repository=${ImageName} --set image.tag=${imageTag} ./charts
+                    helm install --name product --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} ./charts
                     set -e
                     """
                 // update to New version
-                sh "helm upgrade --wait --namespace ${Namespace} --set image.repository=${ImageName} --set image.tag=${imageTag} product ./charts"
+                sh "helm upgrade --wait --namespace ${env.Namespace} --set image.repository=${env.ImageName} --set image.tag=${env.imageTag} product ./charts"
             }
         }
 
