@@ -1,8 +1,9 @@
-node {
+pipeline {
+    agent any
     def Namespace = "default"
     def ImageName = "mati92/product"
     def DockerhubCred = "dockerhub"
-    try {
+    stages {
         stage('Checkout') {
             checkout scm
             sh "git rev-parse --short HEAD > .git/commit-id"
@@ -76,8 +77,5 @@ node {
             }
         }
 
-    } catch (err) {
-        currentBuild.result = 'FAILURE'
-        throw err
     }
 }
