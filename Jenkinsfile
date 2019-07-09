@@ -4,24 +4,32 @@ pipeline {
         def Namespace = "default"
         def ImageName = "mati92/product"
         def DockerhubCred = "dockerhub"
-        def imageTag = sh "git rev-parse --short HEAD > .git/commit-id"
+        def imageTag_i = sh "git rev-parse --short HEAD > .git/commit-id"
         imageTag = readFile('.git/commit-id').trim()
     }
     stages {
         stage('Environment') {
-            sh 'git --version'
-            echo "Branch: ${env.BRANCH_NAME}"
-            sh 'docker -v'
-            sh 'printenv'
+            steps {
+                sh 'git --version'
+                echo "Branch: ${env.BRANCH_NAME}"
+                sh 'docker -v'
+                sh 'printenv'
+            }
         }
         stage('Build Docker test'){
-            sh "docker build -t ${env.ImageName}:${env.imageTag}-test -f Dockerfile.test --no-cache ."
+            steps {
+                sh "docker build -t ${env.ImageName}:${env.imageTag}-test -f Dockerfile.test --no-cache ."
+            }
         }
         stage('Docker test'){
-            sh "docker run --rm ${env.ImageName}:${env.imageTag}-test"
+            steps {
+                sh "docker run --rm ${env.ImageName}:${env.imageTag}-test"
+            }
         }
         stage('Clean Docker test'){
-            sh "docker rmi ${env.ImageName}:${env.imageTag}-test"
+            steps {
+                sh "docker rmi ${env.ImageName}:${env.imageTag}-test"
+            }
         }
         stage('Build Docker for development'){
             when {
