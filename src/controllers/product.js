@@ -4,7 +4,17 @@ const Product = require('../models/product');
 // Get all products
 // =====================
 exports.getProducts = (req, res, next) => {
-    Product.find()
+    let _ids = req.query.ids || null;
+    let queryString;
+    if (_ids) { // if "ids" exists build queryString
+        _ids = _ids.split(','); // create array of ids
+        queryString = { // build mongo query
+            '_id': { $in: _ids }
+        }
+    } else {
+        queryString = {};
+    }
+    Product.find(queryString)
         .then(products => {
             // Return created product
             return res.json({
