@@ -67,7 +67,7 @@ exports.createProduct = (req, res, next) => {
         price: parseInt(body.price, 10),
         stock: parseInt(body.stock, 10),
         imageUrl: body.imageUrl,
-        userId: body.userId || "test"
+        userId: req.user.id
     });
     // Save created product
     product.save(

@@ -16,6 +16,7 @@ module.exports = (req, res, next) => {
                 errors: err
             });
         }
+        req.user = decoded; // add the decoded user to request
         next(); // if valid the next
     });
 };
