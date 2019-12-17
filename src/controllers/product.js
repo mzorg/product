@@ -19,7 +19,7 @@ exports.getProducts = (req, res, next) => {
             // Return created product
             return res.json({
                 ok: true,
-                curso: false,
+                curso: true,
                 data: products
             });
         })
